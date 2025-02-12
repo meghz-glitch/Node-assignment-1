@@ -1,70 +1,76 @@
 const http = require("http");
 const fs = require("fs");
 const url = require("url");
+const path = require("path");
 
 const PORT = 3000;
 
 const server = http.createServer((req, res) => {
     const parsedUrl = url.parse(req.url, true);
-    const path = parsedUrl.pathname;
+    const pathname = parsedUrl.pathname;
     const query = parsedUrl.query;
 
-    res.writeHead(200, { "Content-Type": "text/html" });
-
-    if (path === "/") {
+    if (pathname === "/") {
+        res.writeHead(200, { "Pages-Type": "text/html" });
         res.end(`
-            <h1>Welcome to My Node Server</h1>
+            <h1>Welcome to My Page</h1>
             <p>Navigate to:</p>
             <ul>
                 <li><a href="/about">About Page</a></li>
                 <li><a href="/contact">Contact Page</a></li>
                 <li><a href="/data">Data from File</a></li>
-                <li><a href="/users?name=Alice">User Query Example</a></li>
+                <li><a href="/users?name=Merry,Albin">User Query Example</a></li>
             </ul>
         `);
-    } else if (path === "/about") {
-        fs.readFile("./content/about.html", "utf8", (err, data) => {
+    } else if (pathname === "/about") {
+        fs.readFile(path.join(__dirname, "pages", "about.html"), "utf8", (err, data) => {
             if (err) {
-                res.writeHead(500);
-                res.end("Error loading About page.");
-            } else {
-                res.end(data);
+                res.writeHead(500, { "Pages-Type": "text/plain" });
+                return res.end("Error loading About page.");
             }
+            res.writeHead(200, { "Pages-Type": "text/html" });
+            res.end(data);
         });
-    } else if (path === "/contact") {
-        fs.readFile("./content/contact.html", "utf8", (err, data) => {
+    } else if (pathname === "/contact") {
+        fs.readFile(path.join(__dirname, "pages", "contact.html"), "utf8", (err, data) => {
             if (err) {
-                res.writeHead(500);
-                res.end("Error loading Contact page.");
-            } else {
-                res.end(data);
+                res.writeHead(500, { "Pages-Type": "text/plain" });
+                return res.end("Error loading Contact page.");
             }
+            res.writeHead(200, { "Pages-Type": "text/html" });
+            res.end(data);
         });
-    } else if (path === "/data") {
-        fs.readFile("./content/data.txt", "utf8", (err, data) => {
+    } else if (pathname === "/data") {
+        fs.readFile(path.join(__dirname, "pages", "data.txt"), "utf8", (err, data) => {
             if (err) {
-                res.writeHead(500);
-                res.end("Error loading data.");
-            } else {
-                res.end(`<pre>${data}</pre>`);
+                res.writeHead(500, { "Pages-Type": "text/plain" });
+                return res.end("Error loading data.");
             }
+            res.writeHead(200, { "Pages-Type": "text/plain" });
+            res.end(data);
         });
-    } else if (path === "/users") {
-        fs.readFile("./content/users.json", "utf8", (err, data) => {
+    } else if (pathname === "/users") {
+        fs.readFile(path.join(__dirname, "pages", "users.json"), "utf8", (err, data) => {
             if (err) {
-                res.writeHead(500);
-                res.end("Error loading users.");
-            } else {
+                res.writeHead(500, { "Pages-Type": "text/plain" });
+                return res.end("Error loading users.");
+            }
+
+            try {
                 const users = JSON.parse(data);
                 const userName = query.name;
                 const user = users.find(u => u.name.toLowerCase() === userName.toLowerCase());
 
+                res.writeHead(200, { "Pages-Type": "text/html" });
                 res.end(user ? `<h1>User Found: ${user.name}</h1><p>Age: ${user.age}</p>` 
                             : "<h1>User not found</h1>");
+            } catch (parseError) {
+                res.writeHead(500, { "Pages-Type": "text/plain" });
+                res.end("Error parsing users data.");
             }
         });
     } else {
-        res.writeHead(404);
+        res.writeHead(404, { "Pages-Type": "text/html" });
         res.end("<h1>404 - Page Not Found</h1>");
     }
 });
