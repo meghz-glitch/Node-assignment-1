@@ -11,66 +11,74 @@ const server = http.createServer((req, res) => {
     const query = parsedUrl.query;
 
     if (pathname === "/") {
-        res.writeHead(200, { "Pages-Type": "text/html" });
+        res.writeHead(200, { "Content-Type": "text/html" });
         res.end(`
             <h1>Welcome to My Page</h1>
             <p>Navigate to:</p>
             <ul>
                 <li><a href="/about">About Page</a></li>
                 <li><a href="/contact">Contact Page</a></li>
-                <li><a href="/text">Text from File</a></li>
-                <li><a href="/users?name=Merry,Albin">User Query Example</a></li>
+                <li><a href="/text">Text</a></li>
+                <li><a href="/family">View Family Tree</a></li>
+                <li><a href="/family?name=Albin">Family</a></li>
             </ul>
         `);
     } else if (pathname === "/about") {
         fs.readFile(path.join(__dirname, "pages", "about.html"), "utf8", (err, text) => {
             if (err) {
-                res.writeHead(500, { "Pages-Type": "text/plain" });
+                res.writeHead(500, { "Content-Type": "text/plain" });
                 return res.end("Error loading About page.");
             }
-            res.writeHead(200, { "Pages-Type": "text/html" });
+            res.writeHead(200, { "Content-Type": "text/html" });
             res.end(text);
         });
     } else if (pathname === "/contact") {
         fs.readFile(path.join(__dirname, "pages", "contact.html"), "utf8", (err, text) => {
             if (err) {
-                res.writeHead(500, { "Pages-Type": "text/plain" });
+                res.writeHead(500, { "Content-Type": "text/plain" });
                 return res.end("Error loading Contact page.");
             }
-            res.writeHead(200, { "Pages-Type": "text/html" });
+            res.writeHead(200, { "Content-Type": "text/html" });
             res.end(text);
         });
     } else if (pathname === "/text") {
         fs.readFile(path.join(__dirname, "pages", "text.txt"), "utf8", (err, text) => {
             if (err) {
-                res.writeHead(500, { "Pages-Type": "text/plain" });
+                res.writeHead(500, { "Content-Type": "text/plain" });
                 return res.end("Error loading text.");
             }
-            res.writeHead(200, { "Pages-Type": "text/plain" });
+            res.writeHead(200, { "Content-Type": "text/plain" });
             res.end(text);
         });
-    } else if (pathname === "/users") {
-        fs.readFile(path.join(__dirname, "pages", "users.json"), "utf8", (err, text) => {
+    } else if (pathname === "/family") {
+        fs.readFile(path.join(__dirname, "pages", "family.json"), "utf8", (err, text) => {
             if (err) {
-                res.writeHead(500, { "Pages-Type": "text/plain" });
-                return res.end("Error loading users.");
+                res.writeHead(500, { "Content-Type": "text/plain" });
+                return res.end("Error loading family tree.");
             }
 
             try {
-                const users = JSON.parse(text);
-                const userName = query.name;
-                const user = users.find(u => u.name.toLowerCase() === userName.toLowerCase());
+                const familyTree = JSON.parse(text);
+                const personName = query.name;
 
-                res.writeHead(200, { "Pages-Type": "text/html" });
-                res.end(user ? `<h1>User Found: ${user.name}</h1><p>Age: ${user.age}</p>` 
-                            : "<h1>User not found</h1>");
+                if (!personName) {
+                    const names = familyTree.map(p => p.name).join(", ");
+                    res.writeHead(200, { "Content-Type": "text/html" });
+                    return res.end(`<h1>Family Tree Names</h1><p>${names}</p>`);
+                }
+
+                const person = familyTree.find(p => p.name.toLowerCase() === personName.toLowerCase());
+
+                res.writeHead(200, { "Content-Type": "text/html" });
+                res.end(person ? `<h1>Family Tree for ${person.name}</h1><p>Parents: ${person.parents.join(", ")}</p><p>Children: ${person.children.join(", ")}</p>` 
+                            : "<h1>Person not found in family tree</h1>");
             } catch (parseError) {
-                res.writeHead(500, { "Pages-Type": "text/plain" });
-                res.end("Error parsing users text.");
+                res.writeHead(500, { "Content-Type": "text/plain" });
+                res.end("Error parsing family tree data.");
             }
         });
     } else {
-        res.writeHead(404, { "Pages-Type": "text/html" });
+        res.writeHead(404, { "Content-Type": "text/html" });
         res.end("<h1>404 - Page Not Found</h1>");
     }
 });
