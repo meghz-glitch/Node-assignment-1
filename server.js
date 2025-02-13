@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
                 <li><a href="/contact">Contact Page</a></li>
                 <li><a href="/text">Text</a></li>
                 <li><a href="/family">View Family Tree</a></li>
-                <li><a href="/family?name=Albin">Family</a></li>
+                <li><a href="/family?name=Biju">Family</a></li>
             </ul>
         `);
     } else if (pathname === "/about") {
