@@ -18,46 +18,46 @@ const server = http.createServer((req, res) => {
             <ul>
                 <li><a href="/about">About Page</a></li>
                 <li><a href="/contact">Contact Page</a></li>
-                <li><a href="/data">Data from File</a></li>
+                <li><a href="/text">Text from File</a></li>
                 <li><a href="/users?name=Merry,Albin">User Query Example</a></li>
             </ul>
         `);
     } else if (pathname === "/about") {
-        fs.readFile(path.join(__dirname, "pages", "about.html"), "utf8", (err, data) => {
+        fs.readFile(path.join(__dirname, "pages", "about.html"), "utf8", (err, text) => {
             if (err) {
                 res.writeHead(500, { "Pages-Type": "text/plain" });
                 return res.end("Error loading About page.");
             }
             res.writeHead(200, { "Pages-Type": "text/html" });
-            res.end(data);
+            res.end(text);
         });
     } else if (pathname === "/contact") {
-        fs.readFile(path.join(__dirname, "pages", "contact.html"), "utf8", (err, data) => {
+        fs.readFile(path.join(__dirname, "pages", "contact.html"), "utf8", (err, text) => {
             if (err) {
                 res.writeHead(500, { "Pages-Type": "text/plain" });
                 return res.end("Error loading Contact page.");
             }
             res.writeHead(200, { "Pages-Type": "text/html" });
-            res.end(data);
+            res.end(text);
         });
-    } else if (pathname === "/data") {
-        fs.readFile(path.join(__dirname, "pages", "data.txt"), "utf8", (err, data) => {
+    } else if (pathname === "/text") {
+        fs.readFile(path.join(__dirname, "pages", "text.txt"), "utf8", (err, text) => {
             if (err) {
                 res.writeHead(500, { "Pages-Type": "text/plain" });
-                return res.end("Error loading data.");
+                return res.end("Error loading text.");
             }
             res.writeHead(200, { "Pages-Type": "text/plain" });
-            res.end(data);
+            res.end(text);
         });
     } else if (pathname === "/users") {
-        fs.readFile(path.join(__dirname, "pages", "users.json"), "utf8", (err, data) => {
+        fs.readFile(path.join(__dirname, "pages", "users.json"), "utf8", (err, text) => {
             if (err) {
                 res.writeHead(500, { "Pages-Type": "text/plain" });
                 return res.end("Error loading users.");
             }
 
             try {
-                const users = JSON.parse(data);
+                const users = JSON.parse(text);
                 const userName = query.name;
                 const user = users.find(u => u.name.toLowerCase() === userName.toLowerCase());
 
@@ -66,7 +66,7 @@ const server = http.createServer((req, res) => {
                             : "<h1>User not found</h1>");
             } catch (parseError) {
                 res.writeHead(500, { "Pages-Type": "text/plain" });
-                res.end("Error parsing users data.");
+                res.end("Error parsing users text.");
             }
         });
     } else {
