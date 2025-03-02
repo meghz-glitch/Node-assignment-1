@@ -20,7 +20,8 @@ const server = http.createServer((req, res) => {
                 <li><a href="/contact">Contact Page</a></li>
                 <li><a href="/text">Text</a></li>
                 <li><a href="/family">View Family Tree</a></li>
-                <li><a href="/family?name=Biju">Family</a></li>
+                <li><a href="/family?name=Albin">Albin's Family</a></li>
+                <li><a href="/family?name=Sneha">Sneha's Family</a></li>
             </ul>
         `);
     } else if (pathname === "/about") {
@@ -70,8 +71,16 @@ const server = http.createServer((req, res) => {
                 const person = familyTree.find(p => p.name.toLowerCase() === personName.toLowerCase());
 
                 res.writeHead(200, { "Content-Type": "text/html" });
-                res.end(person ? `<h1>Family Tree for ${person.name}</h1><p>Parents: ${person.parents.join(", ")}</p><p>Children: ${person.children.join(", ")}</p>` 
-                            : "<h1>Person not found in family tree</h1>");
+                if (person) {
+                    res.end(`
+                        <h1>Family Tree for ${person.name}</h1>
+                        <p>Parents: ${person.parents.length > 0 ? person.parents.join(", ") : "No parents"}</p>
+                        <p>Children: ${person.children.length > 0 ? person.children.join(", ") : "No children"}</p>
+                    `);
+                } else {
+                    res.end("<h1>Person not found in family tree</h1>");
+                }
+
             } catch (parseError) {
                 res.writeHead(500, { "Content-Type": "text/plain" });
                 res.end("Error parsing family tree data.");

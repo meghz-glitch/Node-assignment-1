@@ -1,4 +1,4 @@
 [
-    { "name": "Albin", "age": 30 },
-    { "name": "Sneha", "age": 25}
-  ]
+  { "name": "Albin", "age": 30, "parents": ["Albert", "Ani"], "children": ["Ryan"] },
+  { "name": "Sneha", "age": 25, "parents": ["Biju", "Lizzy"], "children": [] }
+]
